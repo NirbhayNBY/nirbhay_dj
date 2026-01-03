@@ -112,6 +112,7 @@ def search(request):
 # DOWNLOAD SONG
 # =========================
 from django.http import FileResponse
+from django.shortcuts import get_object_or_404
 
 def download_song(request, slug):
     song = get_object_or_404(Song, slug=slug)
@@ -119,6 +120,8 @@ def download_song(request, slug):
     song.downloads += 1
     song.save(update_fields=['downloads'])
 
+    filename = f"{song.title} - {song.artist.name}.mp3"
+
     response = FileResponse(song.audio_file.open('rb'), as_attachment=True)
-    response['Content-Disposition'] = f'attachment; filename="{song.slug}.mp3"'
+    response['Content-Disposition'] = f'attachment; filename="{filename}"'
     return response
