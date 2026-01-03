@@ -1,0 +1,44 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <title>{% block title %}Nirbhay DJ – Bhojpuri & Hindi DJ Remix{% endblock %}</title>
+
+    <meta name="description"
+        content="{% block description %}Download Bhojpuri, Hindi, Bhakti, Roadshow DJ Remix songs from Nirbhay DJ.{% endblock %}">
+    <meta name="keywords" content="dj remix, bhojpuri dj, roadshow remix, nirbhay dj">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <div class="logo">🎧 Nirbhay DJ</div>
+    </nav>
+
+    {% block content %}{% endblock %}
+
+    <footer class="footer">
+        © 2026 Nirbhay DJ
+    </footer>
+    <div class="nav-bar-long">
+        <a href="javascript:history.back()" class="nav-btn nav-back">
+            ⬅ Back
+        </a>
+
+        <a href="/" class="nav-btn nav-home">
+            🏠 Home
+        </a>
+
+        <a href="javascript:history.forward()" class="nav-btn nav-forward">
+            Forward ➡
+        </a>
+    </div>
+</body>
+
+</html>

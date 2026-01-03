@@ -1,0 +1,104 @@
+{% extends 'songs/base.html' %}
+
+{% block title %}
+Latest DJ Remix Songs | Nirbhay DJ
+{% endblock %}
+
+{% block description %}
+Download latest Bhojpuri, Bollywood & Bhakti DJ remix songs from Nirbhay DJ.
+{% endblock %}
+
+{% block content %}
+
+<!-- SEARCH BAR -->
+<div style="padding: 20px; text-align:center;">
+    <form action="{% url 'search' %}" method="get" class="search-form" style="justify-content:center;">
+        <input type="text" name="q" placeholder="Search song, artist..." required>
+        <button type="submit">Search</button>
+    </form>
+</div>
+
+<!-- TRENDING SONGS -->
+<section class="section">
+    <h2>🔥 Trending Songs</h2>
+
+    <div class="song-grid">
+        {% for song in trending_songs %}
+        <div class="song-card">
+            <h4>
+                <a href="{% url 'song_detail' song.slug %}">
+                    {{ song.title }}
+                </a>
+            </h4>
+
+            <p>
+                <a href="{% url 'artist_detail' song.artist.slug %}" class="artistcolor">
+                    {{ song.artist.name }}
+                </a>
+            </p>
+
+            <p>⬇️ {{ song.downloads }} | 👁️ {{ song.views }}</p>
+
+        </div>
+        {% empty %}
+        <p>No trending songs yet.</p>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- LATEST UPLOADS -->
+<section class="section">
+    <h2>🆕 Latest Uploads</h2>
+
+    <div class="song-grid">
+        {% for song in page_obj %}
+        <div class="song-card">
+            <h4>
+                <a href="{% url 'song_detail' song.slug %}">
+                    {{ song.title }}
+                </a>
+            </h4>
+
+            <p>
+                <a href="{% url 'artist_detail' song.artist.slug %}" class="artistcolor
+                ">
+                    {{ song.artist.name }}
+                </a>
+            </p>
+
+        </div>
+        {% empty %}
+        <p>No songs uploaded yet.</p>
+        {% endfor %}
+    </div>
+
+    <!-- PAGINATION -->
+    <div class="pagination">
+        {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}">⬅ Previous</a>
+        {% endif %}
+
+        <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+
+        {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}">Next ➡</a>
+        {% endif %}
+    </div>
+</section>
+
+<!-- CATEGORIES -->
+<section class="section">
+    <h2>📂 Categories</h2>
+
+    <div class="category-grid">
+        {% for category in categories %}
+        <a href="{% url 'category_detail' category.slug %}" class="category-card">
+            {{ category.name }}
+        </a>
+        {% empty %}
+        <p>No categories found.</p>
+        {% endfor %}
+    </div>
+</section>
+
+{% endblock %}

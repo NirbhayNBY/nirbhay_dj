@@ -1,0 +1,84 @@
+{% extends 'songs/base.html' %}
+
+{% block title %}
+{{ song.title }} DJ Remix | {{ song.artist.name }} | Nirbhay DJ
+{% endblock %}
+
+{% block description %}
+Download {{ song.title }} DJ remix by {{ song.artist.name }}. High quality MP3 DJ song.
+{% endblock %}
+
+{% block content %}
+
+
+
+
+<section class="section">
+    <div class="song-detail">
+
+        <h1>{{ song.title }}</h1>
+
+        <p>
+            <strong>Artist:</strong>
+            <a href="{% url 'artist_detail' song.artist.slug %}">
+                {{ song.artist.name }}
+            </a>
+        </p>
+
+        <p>
+            <strong>Category:</strong>
+            <a href="{% url 'category_detail' song.category.slug %}">
+                {{ song.category.name }}
+            </a>
+        </p>
+
+        {% if song.thumbnail %}
+        <img src="{{ song.thumbnail.url }}" alt="{{ song.title }}">
+        {% endif %}
+
+        <!-- AUDIO PLAYER -->
+        <audio controls preload="auto" controlslist="nodownload">
+            <source src="{{ song.audio_file.url }}" type="audio/mpeg">
+            Your browser does not support audio.
+        </audio>
+
+        <p>👁️ Views: {{ song.views }} | ⬇️ Downloads: {{ song.downloads }}</p>
+
+        <!-- BIG DOWNLOAD BUTTON -->
+        <a href="{% url 'download_song' song.slug %}" class="download-btn">
+            ⬇ Download MP3
+        </a>
+
+    </div>
+</section>
+
+
+<!-- RELATED SONGS -->
+<section class="section">
+    <h2>🎵 Related Songs</h2>
+
+    <div class="song-grid">
+        {% for rsong in related_songs %}
+        <div class="song-card">
+            <a href="{% url 'song_detail' rsong.slug %}" class="song-link">
+
+                <h4>{{ rsong.title }}</h4>
+
+                <p class="meta">
+                    {{ rsong.artist.name }}
+                    <span class="stats">
+                        ⬇ {{ rsong.downloads }} | 👁 {{ rsong.views }}
+                    </span>
+                </p>
+
+            </a>
+        </div>
+        {% empty %}
+        <p>No related songs found.</p>
+        {% endfor %}
+    </div>
+</section>
+
+
+
+{% endblock %}

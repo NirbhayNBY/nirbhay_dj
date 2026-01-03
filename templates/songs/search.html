@@ -1,0 +1,46 @@
+{% extends 'songs/base.html' %}
+
+{% block title %}
+Search Results | Nirbhay DJ
+{% endblock %}
+
+{% block description %}
+Search DJ remix songs, artists and categories on Nirbhay DJ.
+{% endblock %}
+
+{% block content %}
+
+<section class="section">
+    <h2>🔍 Search Results for "{{ query }}"</h2>
+
+    <div class="song-grid">
+        {% for song in page_obj %}
+        <div class="song-card">
+            <h4>{{ song.title }}</h4>
+            <p>
+                <a href="{% url 'artist_detail' song.artist.slug %}">
+                    {{ song.artist.name }}
+                </a>
+            </p>
+            <a href="{% url 'song_detail' song.slug %}">Open</a>
+        </div>
+        {% empty %}
+        <p>No results found.</p>
+        {% endfor %}
+    </div>
+
+    <!-- PAGINATION -->
+    <div class="pagination">
+        {% if page_obj.has_previous %}
+        <a href="?q={{ query }}&page={{ page_obj.previous_page_number }}">⬅ Previous</a>
+        {% endif %}
+
+        <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+
+        {% if page_obj.has_next %}
+        <a href="?q={{ query }}&page={{ page_obj.next_page_number }}">Next ➡</a>
+        {% endif %}
+    </div>
+</section>
+
+{% endblock %}
