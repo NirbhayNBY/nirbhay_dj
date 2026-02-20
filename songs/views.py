@@ -1,23 +1,33 @@
 from django.shortcuts import render, get_object_or_404
 from django.db.models import Q
 from django.core.paginator import Paginator
+from django.http import FileResponse, StreamingHttpResponse, Http404
+from django.conf import settings
+
+import os
+import mimetypes
+import re
 
 from .models import Song, Category, Artist
+
+
+# Helper: return a Page object for a queryset
+def get_page_obj(request, queryset, per_page=12):
+    paginator = Paginator(queryset, per_page)
+    page_number = request.GET.get('page')
+    return paginator.get_page(page_number)
 
 
 # =========================
 # HOME PAGE
 # =========================
 def home(request):
-    song_list = Song.objects.order_by('-uploaded_at')
-    paginator = Paginator(song_list, 12)
-
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
+    song_list = Song.objects.select_related('artist', 'category').order_by('-uploaded_at')
+    page_obj = get_page_obj(request, song_list, per_page=12)
 
     categories = Category.objects.all()
 
-    trending_songs = Song.objects.order_by(
+    trending_songs = Song.objects.select_related('artist', 'category').order_by(
         '-downloads',
         '-views',
         '-uploaded_at'
@@ -30,17 +40,19 @@ def home(request):
     })
 
 
+
 # =========================
 # SONG DETAIL PAGE
 # =========================
 def song_detail(request, slug):
-    song = get_object_or_404(Song, slug=slug)
+    song = get_object_or_404(Song.objects.select_related('artist', 'category'), slug=slug)
 
     # increase view count
     song.views += 1
     song.save(update_fields=['views'])
-    # RELATED SONGS (same category OR same artist, exclude current)
-    related_songs = Song.objects.filter(
+
+    # RELATED SONGS (same category, exclude current) with select_related
+    related_songs = Song.objects.select_related('artist', 'category').filter(
         category=song.category
     ).exclude(id=song.id).order_by('-downloads')[:10]
 
@@ -49,16 +61,14 @@ def song_detail(request, slug):
         'related_songs': related_songs
     })
 
+
 # =========================
 # CATEGORY PAGE
 # =========================
 def category_detail(request, slug):
     category = get_object_or_404(Category, slug=slug)
-    song_list = Song.objects.filter(category=category).order_by('-uploaded_at')
-
-    paginator = Paginator(song_list, 12)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
+    song_list = Song.objects.select_related('artist', 'category').filter(category=category).order_by('-uploaded_at')
+    page_obj = get_page_obj(request, song_list, per_page=12)
 
     return render(request, 'songs/category_detail.html', {
         'category': category,
@@ -66,21 +76,20 @@ def category_detail(request, slug):
     })
 
 
+
 # =========================
 # ARTIST PAGE
 # =========================
 def artist_detail(request, slug):
     artist = get_object_or_404(Artist, slug=slug)
-    song_list = Song.objects.filter(artist=artist).order_by('-uploaded_at')
-
-    paginator = Paginator(song_list, 12)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
+    song_list = Song.objects.select_related('artist', 'category').filter(artist=artist).order_by('-uploaded_at')
+    page_obj = get_page_obj(request, song_list, per_page=12)
 
     return render(request, 'songs/artist_detail.html', {
         'artist': artist,
         'page_obj': page_obj
     })
+
 
 
 # =========================
@@ -91,15 +100,13 @@ def search(request):
     results = Song.objects.none()
 
     if query:
-        results = Song.objects.filter(
+        results = Song.objects.select_related('artist', 'category').filter(
             Q(title__icontains=query) |
             Q(artist__name__icontains=query) |
             Q(category__name__icontains=query)
         ).distinct()
 
-    paginator = Paginator(results, 12)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
+    page_obj = get_page_obj(request, results, per_page=12)
 
     return render(request, 'songs/search.html', {
         'query': query,
@@ -110,13 +117,6 @@ def search(request):
 # =========================
 # DOWNLOAD SONG
 # =========================
-from django.http import FileResponse
-from django.conf import settings
-from django.http import StreamingHttpResponse, Http404
-import os
-import mimetypes
-import re
-
 def download_song(request, slug):
     song = get_object_or_404(Song, slug=slug)
 
