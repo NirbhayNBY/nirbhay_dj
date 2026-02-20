@@ -20,7 +20,10 @@ urlpatterns = [
 
 
 if settings.DEBUG:
-    urlpatterns += static(
-        settings.MEDIA_URL,
-        document_root=settings.MEDIA_ROOT
-    )
+    # Use a development media streaming view that supports HTTP Range requests
+    # so audio/video seeking works when DEBUG=True.
+    from songs.views import stream_media
+
+    urlpatterns += [
+        path('media/<path:path>', stream_media, name='media')
+    ]

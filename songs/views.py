@@ -113,6 +113,11 @@ def search(request):
 # =========================
 from django.http import FileResponse
 from django.shortcuts import get_object_or_404
+from django.conf import settings
+from django.http import StreamingHttpResponse, Http404
+import os
+import mimetypes
+import re
 
 def download_song(request, slug):
     song = get_object_or_404(Song, slug=slug)
@@ -125,3 +130,57 @@ def download_song(request, slug):
     response = FileResponse(song.audio_file.open('rb'), as_attachment=True)
     response['Content-Disposition'] = f'attachment; filename="{filename}"'
     return response
+
+
+# =========================
+# STREAM MEDIA WITH RANGE SUPPORT (DEV ONLY)
+# =========================
+def _file_iterator(path, start=0, end=None, chunk_size=8192):
+    with open(path, 'rb') as f:
+        f.seek(start)
+        remaining = None if end is None else (end - start + 1)
+        while True:
+            read_size = chunk_size if remaining is None else min(chunk_size, remaining)
+            data = f.read(read_size)
+            if not data:
+                break
+            yield data
+            if remaining is not None:
+                remaining -= len(data)
+                if remaining <= 0:
+                    break
+
+
+def stream_media(request, path):
+    """Stream files from MEDIA_ROOT supporting HTTP Range requests.
+
+    Use only in development (DEBUG=True). Returns 206 for ranged requests.
+    """
+    full_path = os.path.join(settings.MEDIA_ROOT, path)
+    if not os.path.exists(full_path):
+        raise Http404("Media not found")
+
+    file_size = os.path.getsize(full_path)
+    content_type = mimetypes.guess_type(full_path)[0] or 'application/octet-stream'
+
+    range_header = request.META.get('HTTP_RANGE', '').strip()
+    if range_header:
+        m = re.match(r'bytes=(\d+)-(\d*)', range_header)
+        if m:
+            start = int(m.group(1))
+            end = int(m.group(2)) if m.group(2) else file_size - 1
+            if end >= file_size:
+                end = file_size - 1
+            length = end - start + 1
+
+            resp = StreamingHttpResponse(_file_iterator(full_path, start, end), status=206, content_type=content_type)
+            resp['Content-Length'] = str(length)
+            resp['Content-Range'] = f'bytes {start}-{end}/{file_size}'
+            resp['Accept-Ranges'] = 'bytes'
+            return resp
+
+    # No range header; return entire file
+    resp = StreamingHttpResponse(_file_iterator(full_path, 0, file_size - 1), content_type=content_type)
+    resp['Content-Length'] = str(file_size)
+    resp['Accept-Ranges'] = 'bytes'
+    return resp
