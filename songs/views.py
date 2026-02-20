@@ -1,7 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from django.db.models import Q
 from django.core.paginator import Paginator
-from django.http import HttpResponseRedirect
 
 from .models import Song, Category, Artist
 
@@ -112,7 +111,6 @@ def search(request):
 # DOWNLOAD SONG
 # =========================
 from django.http import FileResponse
-from django.shortcuts import get_object_or_404
 from django.conf import settings
 from django.http import StreamingHttpResponse, Http404
 import os
