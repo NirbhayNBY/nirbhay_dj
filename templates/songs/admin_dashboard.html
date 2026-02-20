@@ -1,0 +1,46 @@
+{% extends 'songs/base.html' %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<section class="section">
+    <h1>Admin Dashboard</h1>
+
+    <div class="stats">
+        <p><strong>Total songs:</strong> {{ total_songs }}</p>
+        <p><strong>Total artists:</strong> {{ total_artists }}</p>
+        <p><strong>Total categories:</strong> {{ total_categories }}</p>
+    </div>
+
+    <h2>Recent uploads</h2>
+    <ul>
+        {% for s in recent_songs %}
+        <li>
+            <a href="{% url 'song_detail' s.slug %}">{{ s.title }}</a>
+            — {{ s.artist.name }} ({{ s.uploaded_at }})
+        </li>
+        {% empty %}
+        <li>No recent songs.</li>
+        {% endfor %}
+    </ul>
+
+    <h2>Top downloads</h2>
+    <ol>
+        {% for s in top_downloads %}
+        <li><a href="{% url 'song_detail' s.slug %}">{{ s.title }}</a> — {{ s.downloads }}</li>
+        {% empty %}
+        <li>No data.</li>
+        {% endfor %}
+    </ol>
+
+    <h2>Top views</h2>
+    <ol>
+        {% for s in top_views %}
+        <li><a href="{% url 'song_detail' s.slug %}">{{ s.title }}</a> — {{ s.views }}</li>
+        {% empty %}
+        <li>No data.</li>
+        {% endfor %}
+    </ol>
+
+</section>
+{% endblock %}

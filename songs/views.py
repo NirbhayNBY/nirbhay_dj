@@ -182,3 +182,34 @@ def stream_media(request, path):
     resp['Content-Length'] = str(file_size)
     resp['Accept-Ranges'] = 'bytes'
     return resp
+
+
+# =========================
+# ADMIN DASHBOARD (STAFF ONLY)
+# =========================
+from django.contrib.admin.views.decorators import staff_member_required
+from django.utils import timezone
+
+
+@staff_member_required
+def admin_dashboard(request):
+    # Basic stats
+    total_songs = Song.objects.count()
+    total_artists = Artist.objects.count()
+    total_categories = Category.objects.count()
+
+    # Recent uploads
+    recent_songs = Song.objects.select_related('artist', 'category').order_by('-uploaded_at')[:10]
+
+    # Top downloads and most viewed
+    top_downloads = Song.objects.order_by('-downloads')[:10]
+    top_views = Song.objects.order_by('-views')[:10]
+
+    return render(request, 'songs/admin_dashboard.html', {
+        'total_songs': total_songs,
+        'total_artists': total_artists,
+        'total_categories': total_categories,
+        'recent_songs': recent_songs,
+        'top_downloads': top_downloads,
+        'top_views': top_views,
+    })

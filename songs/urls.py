@@ -11,4 +11,5 @@ urlpatterns = [
     path('download/<slug:slug>/', views.download_song, name='download_song'),
 
     path('search/', views.search, name='search'),
+    path('admin-dashboard/', views.admin_dashboard, name='admin_dashboard'),
 ]
