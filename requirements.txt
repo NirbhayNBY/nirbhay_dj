@@ -2,3 +2,5 @@ Django==5.2.1
 gunicorn
 whitenoise
 Pillow
+psycopg2-binary
+dj-database-url
