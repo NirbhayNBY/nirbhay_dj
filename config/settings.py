@@ -20,11 +20,18 @@ SECRET_KEY = "django-insecure--)b=bx0rtu45ob1994ub@3qh4xp#)xto-tbv_*7_fa5pcz8!js
 
 DEBUG = True
 
-'''ALLOWED_HOSTS = [
+ALLOWED_HOSTS = [
     "nbymix.in",
     "www.nbymix.in",
-]'''
+    "nirbhay-dj.onrender.com",
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://nbymix.in",
+    "https://www.nbymix.in",
+]
 ALLOWED_HOSTS = ["*"]
+DEBUG = False
 
 
 # ==========================
