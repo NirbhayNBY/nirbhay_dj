@@ -21,8 +21,8 @@ SECRET_KEY = "django-insecure--)b=bx0rtu45ob1994ub@3qh4xp#)xto-tbv_*7_fa5pcz8!js
 DEBUG = True
 
 '''ALLOWED_HOSTS = [
-    "127.0.0.1",
-    "localhost",
+    "nbymix.in",
+    "www.nbymix.in",
 ]'''
 ALLOWED_HOSTS = ["*"]
 
