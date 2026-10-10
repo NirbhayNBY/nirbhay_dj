@@ -18,7 +18,13 @@
 <body>
 
     <nav class="navbar">
-        <div class="logo">🎧 NBYmix</div>
+        <a class="logo" href="{% url 'home' %}">🎧 NBYmix</a>
+        <div class="primary-nav">
+            <a href="{% url 'home' %}">Home</a>
+            <a href="{% url 'artist_list' %}">Artists</a>
+            <a href="{% url 'download_list' %}">Downloads</a>
+            <a href="{% url 'category_list' %}">Categories</a>
+        </div>
     </nav>
 
     {% block content %}{% endblock %}

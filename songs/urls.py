@@ -3,6 +3,9 @@ from . import views
 
 urlpatterns = [
     path('', views.home, name='home'),
+    path('artists/', views.artist_list, name='artist_list'),
+    path('downloads/', views.download_list, name='download_list'),
+    path('categories/', views.category_list, name='category_list'),
 
     path('category/<slug:slug>/', views.category_detail, name='category_detail'),
     path('artist/<slug:slug>/', views.artist_detail, name='artist_detail'),

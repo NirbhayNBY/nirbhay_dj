@@ -1,0 +1,42 @@
+{% extends 'songs/base.html' %}
+
+{% block title %}Top Downloads | NBYmix{% endblock %}
+
+{% block description %}
+Browse and download the most popular DJ remix songs on NBYmix.
+{% endblock %}
+
+{% block content %}
+<section class="section">
+    <h2>⬇️ Popular Downloads</h2>
+    <div class="song-grid">
+        {% for song in page_obj %}
+        <div class="song-card">
+            <h4>
+                <a href="{% url 'song_detail' song.slug %}">{{ song.title }}</a>
+            </h4>
+            <p>
+                <a href="{% url 'artist_detail' song.artist.slug %}" class="artistcolor">
+                    {{ song.artist.name }}
+                </a>
+                · {{ song.downloads }} downloads
+            </p>
+            <a href="{% url 'download_song' song.slug %}" class="download-link">
+                Download MP3
+            </a>
+        </div>
+        {% empty %}
+        <p>No songs available to download yet.</p>
+        {% endfor %}
+    </div>
+    <div class="pagination">
+        {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}">⬅ Previous</a>
+        {% endif %}
+        <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}">Next ➡</a>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

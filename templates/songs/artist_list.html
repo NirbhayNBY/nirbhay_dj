@@ -1,0 +1,31 @@
+{% extends 'songs/base.html' %}
+
+{% block title %}Artists | NBYmix{% endblock %}
+
+{% block description %}
+Browse all artists and their DJ remix songs on NBYmix.
+{% endblock %}
+
+{% block content %}
+<section class="section">
+    <h2>🎧 Artists</h2>
+    <div class="category-grid">
+        {% for artist in page_obj %}
+        <a href="{% url 'artist_detail' artist.slug %}" class="category-card">
+            {{ artist.name }}
+        </a>
+        {% empty %}
+        <p>No artists found.</p>
+        {% endfor %}
+    </div>
+    <div class="pagination">
+        {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}">⬅ Previous</a>
+        {% endif %}
+        <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}">Next ➡</a>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}
